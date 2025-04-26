@@ -20,7 +20,7 @@ const sheets = google.sheets('v4');
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
-const KEYFILE = './path/to/your/service-account-file.json'; // Replace with your service account JSON key path
+const KEYFILE = './wilma-416212-5fff7dc2814b.json'; // Replace with your service account JSON key path
  
 // Load the service account credentials
 
@@ -32,7 +32,7 @@ const auth = new google.auth.GoogleAuth({
 
 });
  
-const spreadsheetId = 'your-google-spreadsheet-id'; // Replace with your Google Sheet ID
+const spreadsheetId = '1OxYuAO2fUti_l6PMpJ3lFovq1hdOSyhUcJhS1UnBnaQ'; // Replace with your Google Sheet ID
  
 // API endpoint to receive form data and add it to Google Sheets
 
