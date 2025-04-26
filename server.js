@@ -68,7 +68,7 @@ app.post('/submit-form', async (req, res) => {
 
       spreadsheetId,
 
-      range: 'Sheet1!A:D', // Adjust this range based on your Google Sheet
+      range: 'contact-us-responses!A:D', // Adjust this range based on your Google Sheet
 
       valueInputOption: 'RAW',
 
