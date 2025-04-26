@@ -1,7 +1,7 @@
 const express = require('express');
 const { google } = require('googleapis');
 const bodyParser = require('body-parser');
-const cors = require('cors');  // Import the cors package
+const cors = require('cors');
 
 
 
@@ -50,7 +50,7 @@ const spreadsheetId = '1OxYuAO2fUti_l6PMpJ3lFovq1hdOSyhUcJhS1UnBnaQ'; // Replace
 // API route to handle form submission
 app.post('/submit-form', async (req, res) => {
   try {
-    const authClient = await auth.getClient();
+    // No need for auth.getClient(), just use the `auth` client directly
     const formData = req.body;
 
 
@@ -76,7 +76,7 @@ app.post('/submit-form', async (req, res) => {
       resource: {
         values,
       },
-      auth: authClient,
+      auth: auth,  // Use the auth client directly here
     };
 
 
