@@ -1,3 +1,4 @@
+require('dotenv').config(); 
 const express = require('express');
 const { google } = require('googleapis');
 const bodyParser = require('body-parser');
@@ -50,6 +51,17 @@ const spreadsheetId = '1OxYuAO2fUti_l6PMpJ3lFovq1hdOSyhUcJhS1UnBnaQ'; // Replace
 // API route to handle form submission
 app.post('/submit-form', async (req, res) => {
   try {
+
+    const spreadsheetInfo = await sheets.spreadsheets.get({
+      spreadsheetId,
+      auth: auth,
+    });
+    
+    // Get the first sheet's name from the response
+    const sheetName = spreadsheetInfo.data.sheets[0].properties.title;
+    console.log('Sheet name:', sheetName);
+
+
     // No need for auth.getClient(), just use the `auth` client directly
     const formData = req.body;
 
@@ -58,6 +70,7 @@ app.post('/submit-form', async (req, res) => {
     // Prepare data to insert into Google Sheets
     const values = [
       [
+        formData.userType,
         formData.fullName,
         formData.email,
         formData.phone,
@@ -71,7 +84,7 @@ app.post('/submit-form', async (req, res) => {
     // Prepare the Google Sheets API request
     const request = {
       spreadsheetId,
-      range: 'contact-us-responses!A:F',  // Adjust this range based on your sheet
+      range: `'${sheetName}'!A2:F`,
       valueInputOption: 'RAW',
       resource: {
         values,
@@ -79,10 +92,16 @@ app.post('/submit-form', async (req, res) => {
       auth: auth,  // Use the auth client directly here
     };
 
+ const response = await sheets.spreadsheets.get({
+        spreadsheetId,
+        auth: auth,  // Use the auth client directly here
+        });
+
+
 
 
     // Insert data into Google Sheets
-    await sheets.spreadsheets.values.append(request);
+    const appendResponse = await sheets.spreadsheets.values.append(request);
 
 
 
