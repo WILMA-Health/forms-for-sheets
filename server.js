@@ -1,111 +1,71 @@
 const express = require('express');
-
 const { google } = require('googleapis');
-
 const bodyParser = require('body-parser');
 
-const fs = require('fs');
- 
+// Initialize the app
 const app = express();
-
 const port = process.env.PORT || 3000;
- 
-// Parse incoming requests as JSON
 
+// Middleware to parse incoming JSON
 app.use(bodyParser.json());
- 
-// Initialize the Google Sheets API client
 
+// Google Sheets API Setup
 const sheets = google.sheets('v4');
-
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
-const KEYFILE = './wilma-416212-7d01fc8cfb76.json'; // Replace with your service account JSON key path
- 
-// Load the service account credentials
+// Retrieve credentials from environment variables
+const private_key = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');  // Replace escaped newlines
+const client_email = process.env.GOOGLE_CLIENT_EMAIL;
 
-const auth = new google.auth.GoogleAuth({
+// Create an OAuth2 client using the service account credentials
+const auth = new google.auth.JWT(
+  client_email,
+  null,
+  private_key,
+  SCOPES
+);
 
-  keyFile: KEYFILE,
+const spreadsheetId = '1OxYuAO2fUti_l6PMpJ3lFovq1hdOSyhUcJhS1UnBnaQ'; // Replace with your Google Sheets ID
 
-  scopes: SCOPES,
-
-});
- 
-const spreadsheetId = '1OxYuAO2fUti_l6PMpJ3lFovq1hdOSyhUcJhS1UnBnaQ'; // Replace with your Google Sheet ID
- 
-// API endpoint to receive form data and add it to Google Sheets
-
+// API route to handle form submission
 app.post('/submit-form', async (req, res) => {
-
   try {
-
     const authClient = await auth.getClient();
- 
-    // Get form data from the request body
-
     const formData = req.body;
- 
+
     // Prepare data to insert into Google Sheets
-
     const values = [
-
       [
-
         formData.fullName,
-
         formData.email,
-
         formData.subject,
-
         formData.message,
-
       ],
-
     ];
- 
+
+    // Prepare the Google Sheets API request
     const request = {
-
       spreadsheetId,
-
-      range: 'contact-us-responses!A:D', // Adjust this range based on your Google Sheet
-
+      range: 'contact-us-responses!A:F',  // Adjust this range based on your sheet
       valueInputOption: 'RAW',
-
       resource: {
-
         values,
-
       },
-
       auth: authClient,
-
     };
- 
-    // Append data to the Google Sheets document
 
-    const response = await sheets.spreadsheets.values.append(request);
- 
-    // Respond back to the client
+    // Insert data into Google Sheets
+    await sheets.spreadsheets.values.append(request);
 
+    // Respond with success
     res.status(200).json({ status: 'success', message: 'Data submitted successfully!' });
-
   } catch (error) {
-
     console.error('Error:', error);
-
     res.status(500).json({ status: 'error', message: 'There was an error processing the request.' });
-
   }
-
 });
- 
+
 // Start the server
-
 app.listen(port, () => {
-
-  console.log(`Server is running on port ${port}`);
-
+  console.log(`Proxy server running on port ${port}`);
 });
-
- 
